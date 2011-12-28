@@ -14,10 +14,10 @@
 
 (std:in-defpackage :cl-match (:use :cl :std) (:export :cl-match-pattern)
 		   (:export :ifmatch :letmatch :match :defpattern))
-(use-std-readtable)
+(use-doodads-readtable)
 
 (def all-equal (xs)
-  [(not xs) or (lett x0 (car xs) (apply #'andf (mapcar #f[_ equal x0] (cdr xs))))])
+  [(not xs) or (let1 x0 (car xs) (apply #'andf (mapcar #f[_ equal x0] (cdr xs))))])
 
 (defstruct vgt  vars gensyms test) ;; a complete test with vars & gensyms
 (defstruct conj vars tests gensyms ors whens) ;; a conjunction of subtests
@@ -54,7 +54,7 @@
 
 (defmac with-gensym-conj ((conj gensym expr &rest tests) &body body)
   "Create and bind a conj with a gensym, a setft form, and optional tests."
-  (lett gensym-is-list [gensym islist]
+  (let1 gensym-is-list [gensym islist]
     (if gensym-is-list
 	(assert [gensym has-length 2] (gensym)
 		"with-gensym-conj: list gensym must have exactly two elements.")
@@ -67,7 +67,7 @@
 		(,x (if ,expr-is-big ,gensym-form ,expr))
 		(,all-tests (list ,@tests)))
 	  (when ,expr-is-big (push `(setft ,,x ,,expr) ,all-tests))
-	  (lett ,conj (new-conj nil (nreverse ,all-tests) [,expr-is-big and (list ,x)])
+	  (let1 ,conj (new-conj nil (nreverse ,all-tests) [,expr-is-big and (list ,x)])
 	    ,@body))))))
 
 (def patrn-type (x)
@@ -83,9 +83,9 @@
 (def push-test   ( test  conj) (unless [test eq t] (push  test  (conj-tests   conj))))
 
 (def push-conj (src dest)
-  (asrt [dest conj-p] (dest) "dest is not a conj")
+  (asrt (conj-p dest) (dest) "dest is not a conj")
   (when src
-    (asrt [src conj-p] (src) "src is not a conj")
+    (asrt (conj-p src) (src) "src is not a conj")
     (pushlist (conj-vars    src) (conj-vars    dest)) ; uniq only!
     (pushlist (conj-tests   src) (conj-tests   dest))
     (pushlist (conj-gensyms src) (conj-gensyms dest))
@@ -111,7 +111,7 @@
 	(patrn (if (cdr parts) (cadr parts) '_)))
     (assert (not [name is-literal]) (name)
 	    "Literal found in AS pattern. 1st arg must be a name.")
-    (lett conj (cond ([name is-wildcard] (new-conj))
+    (let1 conj (cond ([name is-wildcard] (new-conj))
 		     ((find name vars)  (new-conj nil (list `[,expr eql ,name])))
 		     (t                (new-conj (list name) (list `(setft ,name ,expr)))))
       (push-conj (patrn-conj expr patrn vars)
@@ -163,7 +163,7 @@
   (case (length parts)
     (0 (new-conj nil (list nil)))
     (1 (patrn-conj expr (car parts) vars old-level))
-    (t (lett new-level (case old-level (:top :top) (t :or))
+    (t (let1 new-level (case old-level (:top :top) (t :or))
 	 (eif (not [parts are-all-vals])
 	     (with-gensym x
 	       (new-conj nil (list `(setft ,x ,expr))
@@ -214,7 +214,7 @@
 	(when f-exists
 	  (push-test (funcall f-exists x name) conj))
 	(asrt [part-is-atom or (not (cddr part))] (part) "too many items in ~A entry" typestr)
-	(lett slot-patrn (if part-is-atom part (if (cdr part) (cadr part) '_))
+	(let1 slot-patrn (if part-is-atom part (if (cdr part) (cadr part) '_))
 	  (unless [slot-patrn is-wildcard]
 	    (when f-bound
 	      (push-test (funcall f-bound x name) conj))
@@ -261,7 +261,7 @@
       (patrn-conj `(aref ,array ,@(reverse hi-bak-ns))
 		  (if elt-type `(type ,elt-type ,patrn) patrn) vars)
     (asrt [(length patrn) = (car lo-dims)] (lo-dims patrn) "dimension mismatch.")
-    (lett conj (new-conj)
+    (let1 conj (new-conj)
       (count-list (n p patrn conj)
 	  (push-conj (subarray-conj array (cons n hi-bak-ns) (cdr lo-dims)
 				    p (append (conj-vars conj) vars) elt-type)
@@ -292,7 +292,7 @@
 
 (def type-conj (expr parts vars)
   (asrt [parts islist :min-length 1 :max-length 2] (parts) "TYPE pattern takes 1 or 2 args.")
-  (lett type (car parts)
+  (let1 type (car parts)
     (with-gensym-conj (conj (x "TYPE") expr `(typep ,x ',type))
       (when (cdr parts) (push-conj (patrn-conj x (cadr parts) vars) conj))
       conj)))
@@ -312,7 +312,7 @@
   (asrt (find level '(:top :or)) (level) "misplaced WHEN guard.")
   (asrt parts nil "No test in WHEN guard.")
   (asrt (not (cddr parts)) (parts) "Too many parts in WHEN guard")
-  (lett conj (new-conj nil nil nil nil (list (car parts)))
+  (let1 conj (new-conj nil nil nil nil (list (car parts)))
     (when (cdr parts)
       (push-conj (patrn-conj expr (cadr parts) vars level)
 		 conj))
@@ -342,17 +342,17 @@
 (def patrn-conj (expr patrn vars &optional level)
   (eif (atom patrn)
       (atom-conj expr patrn vars)
-    (lett type-spec (car patrn)
+    (let1 type-spec (car patrn)
       (eif [type-spec has-type '(or string keyword)]
 	  (default-conj expr patrn vars level)
 	(assert [type-spec is-symbol] (type-spec) "Pattern type must be a string or symbol.")
-	(lett xformr (get type-spec 'cl-match-pattern)
+	(let1 xformr (get type-spec 'cl-match-pattern)
 	  (eif xformr
 	      (patrn-conj expr (funcall xformr (cdr patrn)) vars level)
 	    (default-conj expr            patrn             vars level)))))))
 
 (def all-same-vars (unsorted-lists)
-  (lett lists (copy-tree unsorted-lists)
+  (let1 lists (copy-tree unsorted-lists)
     (mapc #f(sort _ #'string< :key #'symbol-name)
 	  lists)
     (all-equal lists)))
@@ -372,7 +372,7 @@
 		      (or-gensyms gensyms)
 		      (or-test    test))
 		(ors-vgt vars ors [whens and `(,when)])
-	      (lett test
+	      (let1 test
 		  (if (no whens)
 		      `(and ,@tests ,or-test)
 		      `(and ,@tests (flet ((,when () (and ,@whens))) ,or-test)))
@@ -385,9 +385,9 @@
 
 (eval-always
   (def binding-test (multibindings)
-    (lett tests '()
+    (let1 tests '()
       (dolist (mb multibindings)
-	(lett var (car mb)
+	(let1 var (car mb)
 	  (dolist (expr (cdadr mb))	;the rest of the bindings
 	    (push `[,var eql ,expr] tests))))
       (case (length tests)
@@ -402,7 +402,7 @@
      (if [type type= :vals] (length parts)
 	 (and [type type= :or]
 	      [parts are-all-vals]
-	      (lett nums (mapcar (lambda (part) (length (cdr part))) parts)
+	      (let1 nums (mapcar (lambda (part) (length (cdr part))) parts)
 		(if (reduce #'= nums) (car nums)
 		    (error "OR pattern:  VALS must all have the same length."))))))])
 
@@ -455,7 +455,7 @@
 (defmac defpattern (patrn args &body body)
   (check-type patrn symbol "DEFPATTERN: 1st arg must a symbol")
   `(eval-always
-    (setf (get ',patrn 'cl-match-pattern) #f(lett ,args _ ,@body))))
+    (setf (get ',patrn 'cl-match-pattern) #f(let1 ,args _ ,@body))))
 
 #|
 
@@ -483,7 +483,7 @@
 (def not-conj (expr parts vars)
   (assert [parts has-length 1] (parts) "NOT pattern must have exactly one part.")
   (with-gensym-conj (not-conj (x "NOT") expr)
-    (lett patrn-conj (patrn-conj x (car parts) vars)
+    (let1 patrn-conj (patrn-conj x (car parts) vars)
       (eif [(conj-ors patrn-conj) or (conj-whens patrn-conj)]
 	  (setf (conj-ors not-conj) (list patrn-conj)) ;; patrn-conj will be negated in OR-VGT
 	(let* ((tests (append (conj-tests patrn-conj)

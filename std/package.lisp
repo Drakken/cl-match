@@ -1,4 +1,4 @@
-;; standard-cl package
+;; Doodads package
 #|
 ---------------------------------------------------------------
 ;; This software is Copyright (c) 2008 Daniel S. Bensen.
@@ -10,17 +10,17 @@
 |#
 
 (cl:defpackage
-    :standard-cl (:use :cl) (:nicknames :std)
+    :doodads (:use :cl) (:nicknames :std)
     (:export 
      ;;syntax
-     :make-std-readtable :use-std-readtable
+     :make-doodads-readtable :use-doodads-readtable
      ;;base
      :in-defpackage :eval-always :xport
      :defmac :macx :with-gensyms :with-gensym
      :def :defx :indef :indefx :greturn :gfuncname
      :while :until :do-while :do-until
-     :lett :letvals
-     ;;standard
+     :let1 :letvals
+     ;;doodads
      :gensyms :eif :2list<-plist :letts :external-symbols
      :no :concat :concstr :ask-yn :ask-yes-no :defparam
      :debug-out :echo :prompt
@@ -36,7 +36,7 @@
      :is-lc :is-uc :is-letr :lc<-int :uc<-int :int<-letr
      :? :flatten :npushlit :pushlist :pushrevlist
      :trim-whitespace :trim-linespace
-     :pushwhen :letwhen :setwhen :cond-eql :strcase
+     :pushwhen :when-let :setwhen :cond-eql :strcase
      :dovector :string-or-symbol-name
      :letstruct :letstruct-if
      :cwd :cd :quit

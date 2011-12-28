@@ -7,11 +7,11 @@
 
 (defvar *test-name* nil)
 
-(use-std-readtable)
+(use-doodads-readtable)
 
 (defmac deftest (name parameters &body body)
   `(defun ,name ,parameters
-    (lett *test-name* (cons ',name *test-name*)
+    (let1 *test-name* (cons ',name *test-name*)
       ,@body)))
 
 (def pass-fail (rzult form)
@@ -20,7 +20,7 @@
 
 (defmac all-okay (&body forms)
   (with-gensym okay
-    `(lett ,okay t
+    `(let1 ,okay t
       ,@(mapcar (lambda (form) `(unless ,form (setf ,okay nil)))
 		forms)
       ,okay)))

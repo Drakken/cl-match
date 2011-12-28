@@ -1,4 +1,4 @@
-;; standard-cl:  a standard libary for Common Lisp
+;; doodads:  a utility libary for Common Lisp
 #|
 -------------------------------------------------------------------------
 This software is Copyright (c) 2008 Daniel S. Bensen.
@@ -11,7 +11,7 @@ This software is provided "as is" with no express or implied warranty.
 
 (cl:declaim (optimize debug))
 
-(cl:in-package :standard-cl)
+(cl:in-package :doodads)
 
 (def gensyms (n) (loop repeat n collect (gensym)))
 
@@ -29,15 +29,15 @@ This software is provided "as is" with no express or implied warranty.
 (defmac letts (plist &body body)
   (eif (no plist)
       `(progn ,@body)
-    (lett bindings (nreverse (2list<-plist plist))
+    (let1 bindings (nreverse (2list<-plist plist))
       (assert bindings (bindings) "LETTS: malformed binding list")
-      (lett binding (car bindings)
-	(setf body `(lett ,(car binding) ,(cadr binding) ,@body))
+      (let1 binding (car bindings)
+	(setf body `(let1 ,(car binding) ,(cadr binding) ,@body))
 	(dolist (binding (cdr bindings) body)
-	  (setf body `(lett ,(car binding) ,(cadr binding) ,body)))))))
+	  (setf body `(let1 ,(car binding) ,(cadr binding) ,body)))))))
 
 (def external-symbols (&optional (package *package*))
-  (lett symbols nil
+  (let1 symbols nil
     (do-external-symbols (symbol package (nreverse symbols))
       (push symbol symbols))))
 
@@ -61,7 +61,7 @@ This software is provided "as is" with no express or implied warranty.
 (def sethash (key table val) (setf (gethash key table) val))
 
 (defmac for ((var init test incr) &body body)
-      `(lett ,var ,init
+      `(let1 ,var ,init
 	(while ,test
 	  ,@body
 	  (setf ,var ,incr))))
@@ -73,7 +73,7 @@ This software is provided "as is" with no express or implied warranty.
 
 (defmac dopairs ((x y list) &body body)
       (with-gensym cell
-	`(lett ,x (car ,list)
+	`(let1 ,x (car ,list)
 	  (docells (,cell (cdr ,list))
 	   (dolist (,y (cdr ,cell))
 	     ,@body
@@ -135,7 +135,7 @@ This software is provided "as is" with no express or implied warranty.
 
 (def  orf (&rest vals) (dolist (val vals nil) (when   val (return val))))
 (def andf (&rest vals)
-  (lett rzult t
+  (let1 rzult t
     (dolist (val vals rzult) (if val (setf rzult val) (return nil)))))
 
 (def /_ (x y) (floor x y))
@@ -222,11 +222,11 @@ This software is provided "as is" with no express or implied warranty.
 
 (defmac pushwhen (expr place)
   (with-gensym val
-    `(lett ,val ,expr
+    `(let1 ,val ,expr
       (when ,val (push ,val ,place)))))
 
-(defmac letwhen (var pred &body body)
-  `(lett ,var ,pred
+(defmac when-let (var pred &body body)
+  `(let1 ,var ,pred
      (when ,var ,@body)))
 
 (defmac setwhen (oldval place newval)
@@ -243,7 +243,7 @@ This software is provided "as is" with no express or implied warranty.
 
 (defmac strcase (expr &rest clauses)
   (with-gensym val
-  `(lett ,val ,expr
+  `(let1 ,val ,expr
     (cond
       ,@(mapcar (lambda (clause) (if (eq (car clause) t)        `(t ,@(cdr clause))
 				 `((string= ,val ,(car clause)) ,@(cdr clause))))
@@ -261,7 +261,7 @@ This software is provided "as is" with no express or implied warranty.
 
 (defun letstruct-testable (testing type- slots expr body)
   "Deconstruct a struct.  Testing for struct existance is optional."
-  (lett prefix (string-or-symbol-name type-)
+  (let1 prefix (string-or-symbol-name type-)
     (with-gensym val
       (flet ((slotbinding (slot)
 	       (let* ((is-atom (atom slot))
@@ -276,22 +276,22 @@ This software is provided "as is" with no express or implied warranty.
 				     slotexpr1)))
 		 (list slotname slot-expr))))
 	(if slots
-	    `(lett ,val ,expr
+	    `(let1 ,val ,expr
 	      (let ,(mapcar #'slotbinding slots) ,@body))
-	    `(lett ,val ,expr                    ,@body))))))
+	    `(let1 ,val ,expr                    ,@body))))))
 
 (defmac letstruct    ((type- . slots) x &body body) (letstruct-testable nil type- slots x body))
 (defmac letstruct-if ((type- . slots) x &body body) (letstruct-testable  t  type- slots x body))
 
 (def |read_case| (case)
-  (lett readtable (copy-readtable nil)
+  (let1 readtable (copy-readtable nil)
     (setf (readtable-case readtable) case)
     (setf *readtable* readtable)))
 
 (def cwd () (truename "."))
 
 (def cd (pathstr)
-;;  (lett char0 (char dir 0)
+;;  (let1 char0 (char dir 0)
     (setf *default-pathname-defaults*
 	  (pathname pathstr)))
 	;;  (if [char0 char= #\/]

@@ -13,7 +13,7 @@ There are three ways to load cl-match:
 * load the file load.lisp in this directory
 * asdf-install :cl-match
 * asdf-load the system files in this directory:
-  * standard-cl   (general-purpose library)
+  * doodads       (general-purpose library)
   * cl-match      (pattern matching)
   * pcl-unit-test (unit testing framework)
   * cl-match-test (unit tests)

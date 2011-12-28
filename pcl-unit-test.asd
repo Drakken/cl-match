@@ -1,7 +1,7 @@
 ;;(cl:in-package :cl)
 
 (asdf:defsystem :pcl-unit-test
-  :depends-on (:standard-cl)
+  :depends-on (:doodads)
   :components (
     (:file "pcl-unit-test")
 ))

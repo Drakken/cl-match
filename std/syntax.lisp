@@ -1,4 +1,4 @@
-;;; standard-cl:  syntax
+;;; doodads syntax
 #|
 -------------------------------------------------------------------------
 This software is Copyright (c) 2008 Daniel S. Bensen.
@@ -9,15 +9,15 @@ This software is provided "as is" with no express or implied warranty.
 -------------------------------------------------------------------------
 |#
 
-(in-package :standard-cl)
+(in-package :doodads)
 
-(def make-std-readtable ()
-  (lett table (copy-readtable nil)
+(def make-doodads-readtable ()
+  (let1 table (copy-readtable nil)
     (set-macro-character #\[      #'|read-[2-fix]|         nil table) 
     (set-macro-character #\] (get-macro-character #\) nil) nil table)
     (set-dispatch-macro-character #\# #\f #'|read-#func|       table)
     table))
 
-(defmac use-std-readtable ()
+(defmac use-doodads-readtable ()
   '(eval-when (:execute :compile-toplevel)
-    (setf *readtable* (make-std-readtable))))
+    (setf *readtable* (make-doodads-readtable))))

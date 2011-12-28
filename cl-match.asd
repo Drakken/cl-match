@@ -1,6 +1,6 @@
 
 (asdf:defsystem :cl-match
-  :depends-on (:standard-cl)
+  :depends-on (:doodads)
   :components (
     (:file :match)
 ))

@@ -1,4 +1,4 @@
-;;; standard-cl:  partial application
+;;; doodads partial application
 #|
 -------------------------------------------------------------------------
 This software is Copyright (c) 2008 Daniel S. Bensen.
@@ -9,7 +9,7 @@ This software is provided "as is" with no express or implied warranty.
 -------------------------------------------------------------------------
 |#
 
-(cl:in-package :standard-cl)
+(cl:in-package :doodads)
 
 ;; #f(func _ arg _)
 ;; #f[_ op _]

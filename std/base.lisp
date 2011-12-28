@@ -1,4 +1,4 @@
-;; standard-cl:  a standard libary for Common Lisp
+;; Doodads:  a utility libary for Common Lisp
 #|
 -------------------------------------------------------------------------
 This software is Copyright (c) 2008 Daniel S. Bensen.
@@ -11,7 +11,7 @@ This software is provided "as is" with no express or implied warranty.
 
 (cl:declaim (optimize debug))
 
-(cl:in-package :standard-cl)
+(cl:in-package :doodads)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defmacro eval-always (&body body)
@@ -53,7 +53,7 @@ This software is provided "as is" with no express or implied warranty.
 
 ;;; BINDING
 
-  (defmac lett (x expr &body body)
+  (defmac let1 (x expr &body body)
     (if (atom x)
 	`(let ((,x ,expr)) ,@body)
 	`(destructuring-bind ,x ,expr ,@body)))
@@ -76,7 +76,7 @@ This software is provided "as is" with no express or implied warranty.
 		  (eq (caar body) 'declare)) (push (pop body) preamble)))
     (with-gensym (val "GRETURN-VAL")
       (setf body
-	    (list `(lett gfuncname (symbol-name ',func)
+	    (list `(let1 gfuncname (symbol-name ',func)
 		    (declare (ignorable gfuncname))
 		    (macrolet ((greturn (&optional (,val (values)))
 				 `(return-from ,',func ,,val))) ;; C-style return

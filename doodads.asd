@@ -1,6 +1,6 @@
 ;; asdf system def for standard-cl
 
-(defsystem :standard-cl
+(defsystem :doodads
   :components (
     (module "std"
       :serial t
@@ -9,7 +9,7 @@
         (:file "base")
         (:module :content
            :components (
-             (:file "standard")
+             (:file "doodads")
              (:file "2fix")
              (:file "func")))
         (:file "syntax")

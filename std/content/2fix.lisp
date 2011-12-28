@@ -16,7 +16,7 @@ This software is provided "as is" with no express or implied warranty.
 ;;		     ^ ^2 ^3 ^4 ^5 ^6 ^7 ^8 def-op= =0 >0 <0 >=0 <=0 !=0))
 ;;(in-package :2fix)
 
-(in-package :standard-cl)
+(in-package :doodads)
 
 (defun |read-[2-fix]| (stream char) 
   (declare (ignore char)) 
@@ -48,7 +48,7 @@ This software is provided "as is" with no express or implied warranty.
 	(= (length x) n)
 	(if (zerop n)
 	    (not x)
-	    (lett last-cdr (nthcdr (1- n) x)
+	    (let1 last-cdr (nthcdr (1- n) x)
 	      (and last-cdr (not (cdr last-cdr)))))))
 
   (defmac def-isseq (isseq seqp)

@@ -1,4 +1,4 @@
-;;;load standard-cl
+;;;load Doodads
 ;;;by Dan Bensen
 
 ;;; each file is a list of a pathname and file name
@@ -12,7 +12,7 @@
        (main-list `(:serial
 		    (,std "package")
 		    (,std "base")
-		    ((,content "standard") (,content "2fix") (,content "func"))
+		    ((,content "doodads") (,content "2fix") (,content "func"))
 		    (,std "syntax"))))
   (labels ((load-file (path name compiling)
 	     (let* ((src (make-pathname :name name :type "lisp" :defaults path))
