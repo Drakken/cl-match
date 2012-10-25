@@ -103,9 +103,9 @@
         ((find atom vars) (new-conj nil (list `[,expr eql ,atom])))
         ([atom is-literal]
          (typecase atom
-           (number (new-conj nil (list `(= ,expr ,atom))))
-           (string (new-conj nil (list `(string= ,expr ,atom))))
-           (t (new-conj nil (list `[,expr eql ,atom])))))
+           (number (new-conj nil (list `[,expr = ,atom])))
+           (string (new-conj nil (list `[,expr string= ,atom])))
+           (t      (new-conj nil (list `[,expr eql ,atom])))))
 	([[atom is-literal]
 	  or (find atom vars)] (new-conj nil (list `[,expr eql ,atom])))
 	(t                     (new-conj (list atom) (list `(setft ,atom ,expr))))))
